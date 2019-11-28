@@ -2,14 +2,37 @@
 
       <div class="card text-center">
         <div class="card-header text-left">
-          Featured
+          {{ info.title }}
         </div>
         <div class="card-body">
-          <img class="card-img-top" src="/images/unsplash.jpg" alt="Maznusmo s unsplasha i bilo bi lijepo da napisemo cija je slika">
+          <img @click="change" class="card-img-top" :src="info.url" alt="Maznusmo s unsplasha i bilo bi lijepo da napisemo cija je slika">
         </div>
         <div class="card-footer text-left">
-          2 days ago
+          {{ info.time }}
         </div>
       </div>
 
 </template>
+
+<script>
+export default {
+  props: ["info"],
+
+  methods: {
+    change() {
+      this.info.time = 'Fetching...'
+      fetch(`https://source.unsplash.com/1600x900`).then((response) => {   
+        console.log(response)
+        this.info.url = response.url
+        this.info.time = 'Done.'
+      }) 
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  img:hover {
+    cursor: pointer;
+  }
+</style>
