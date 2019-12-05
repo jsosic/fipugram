@@ -1,3 +1,123 @@
+# WEEK 4
+
+## Povezivanje Authentication tehnologije iz Firebasea
+- Firebase account
+- Napravimo novi projekt
+- Auth docs: https://firebase.google.com/docs/web/setup?authuser=0
+- Dodamo Firebase skripte na kraj body taga u index.html
+
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
+
+  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-analytics.js"></script>
+
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-firestore.js"></script>
+
+- Dodamo firebaseConfig koji izvucemo iz Project Settings u novi script tag
+
+## Poziv auth API-a iz aplikacije
+
+- Pogledamo https://github.com/firebase/quickstart-js/blob/fcf68cb3f0bfc033d536447b65967f4b0567720e/auth/email-password.html
+
+### Signup
+
+- Dodamo form handler @submit.prevent="signup"
+
+	<script>
+	export default {
+	data () {
+		return {
+		email: '',
+		password: '',
+		password2: ''
+		}
+	},
+	methods: {
+		signup () {
+		firebase.auth().createUserWithEmailAndPassword(this.email, this.password).catch(function(error) {
+			console.log(error);
+		});
+		}
+	}
+	}
+
+- 2-way binding
+
+        <div class="form-group">
+          <label for="emailField">Email address</label>
+          <input v-model="email" type="email" class="form-control" id="emailField" aria-describedby="emailHelp" placeholder="Enter email">
+          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group">
+          <label for="passwordField">Password</label>
+          <input v-model="password" type="password" class="form-control" id="passwordField" placeholder="Password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPasswordField">Confirm Password</label>
+          <input v-model="password2" type="password" class="form-control" id="confirmPasswordField" placeholder="Confirm password">
+        </div>
+
+- Dodamo auth change callback (Firebase nam javi promjene) u App.vue (primijetite this -> self)
+
+	<script type="text/javascript">
+	import store from '@/store.js'
+
+	export default {
+	data () {
+		return store;
+	},
+
+	methods: {
+		logout() {
+		this.authenticated = false
+		}
+	},
+
+	mounted() {
+		const self = this;
+		firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			self.userEmail = user.email;
+			self.authenticated = true;
+			console.log(`Authenticated: ${self.userEmail}`)
+			if (self.$route.name !== 'home')
+			self.$router.push({name: 'home'})
+		}
+		else {
+			self.authenticated = false
+			console.log('Logged out')
+			if (self.$route.name !== 'login')
+			self.$router.push({name: 'login'})
+		}
+		});
+	}
+	}
+	</script>
+
+- Maknemo iz store-a userName i promijenimo header u App.vue da prikazuje userEmail
+
+	<span v-if="authenticated">
+		{{ userEmail }}
+		<a @click="logout" class="btn btn-info my-2 my-sm-0 mr-2" href="#">Logout</a>
+	</span>
+
+- Promijenimo logout da stvarno napravi Firebase logout
+
+    logout() {
+      firebase.auth().signOut();
+    }
+
+- Povezemo login na isti nacin kao i signup
+
+- Sakrijemo sadrzaj ako user nije logiran
+
+      <div v-if="authenticated">
+        <InstagramCard :key="card.id" :info="card" v-for="card in filteredCards" />
+      </div>
+
+
 # WEEK 2
 
 # Zelimo lijep Instagram header

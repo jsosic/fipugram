@@ -19,8 +19,8 @@
                 </form>
                 <router-link v-if="!authenticated" class="btn btn-info my-2 my-sm-0 mr-2" to="/login">Login</router-link>
                 <span v-if="authenticated">
-                  {{ userName }}
-                  <a @click="logout" class="btn btn-info my-2 my-sm-0 mr-2" href="#">Logout</a>
+                  {{ userEmail }}
+                  <a @click.prevent="logout" class="btn btn-info my-2 my-sm-0 mr-2" href="#">Logout</a>
                 </span>
                 <router-link class="btn btn-outline my-2 my-sm-0 mr-2" to="/signup">Signup</router-link>
             </div>
@@ -50,8 +50,27 @@ export default {
 
   methods: {
     logout() {
-      store.authenticated = false
+      firebase.auth().signOut();
     }
+  },
+
+  mounted() {
+    const self = this
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        self.userEmail = user.email;
+        self.authenticated = true;
+        console.log(`Authenticated: ${self.userEmail}`)
+        if (self.$route.name !== 'home')
+          self.$router.push({name: 'home'})
+      }
+      else {
+        self.authenticated = false
+        console.log('Logged out')
+        if (self.$route.name !== 'login')
+          self.$router.push({name: 'login'})
+      }
+    });
   }
 }
 </script>
