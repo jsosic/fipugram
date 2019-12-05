@@ -22,7 +22,7 @@
                   {{ userEmail }}
                   <a @click.prevent="logout" class="btn btn-info my-2 my-sm-0 mr-2" href="#">Logout</a>
                 </span>
-                <router-link class="btn btn-outline my-2 my-sm-0 mr-2" to="/signup">Signup</router-link>
+                <router-link v-if="!authenticated" class="btn btn-outline my-2 my-sm-0 mr-2" to="/signup">Signup</router-link>
             </div>
           </nav>
         </div>
