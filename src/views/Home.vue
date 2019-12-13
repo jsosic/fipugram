@@ -3,6 +3,14 @@
     <div class="col-8">
 
       <div v-if="authenticated">
+
+        <form @submit.prevent="postImage">
+          <div class="form-group">
+            <input v-model="postImageUrl" type="text" class="form-control" placeholder="Paste the image URL">
+          </div>
+          <button type="submit" class="btn btn-primary mb-5">Post</button>
+        </form>
+
         <InstagramCard :key="card.id" :info="card" v-for="card in filteredCards" />
       </div>
 
@@ -30,7 +38,23 @@ export default {
       //   }
       // }
       // return filtered;
-      return this.cards.filter(card => card.title.includes(this.searchTerm));
+      return this.cards.filter(card => card.postedBy.includes(this.searchTerm));
+    }
+  },
+  methods: {
+    postImage () {
+      db.collection("posts-real").add({
+        postedBy: this.userEmail, 
+        time: Date.now(), 
+        url: this.postImageUrl
+      })
+      .then(function(docRef) {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch(function(error) {
+        console.error("Error adding document: ", error);
+      });
+      this.postImageUrl = ''
     }
   },
   name: 'home',

@@ -70,6 +70,28 @@ export default {
           this.$router.push({name: 'login'}).catch(err => console.log(err))
       }
     });
+
+    db.collection("posts-real").orderBy("time").limit(30).onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+              const data = change.doc.data()
+              if (data.postedBy) {
+                this.cards.unshift({
+                  id: change.doc.id,
+                  postedBy: data.postedBy,
+                  time: data.time, 
+                  url: data.url
+                })
+              }
+            }
+            // if (change.type === "modified") {
+            //     console.log("Modified city: ", change.doc.data());
+            // }
+            // if (change.type === "removed") {
+            //     console.log("Removed city: ", change.doc.data());
+            // }
+        });
+    });
   }
 }
 </script>
