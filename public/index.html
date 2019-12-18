@@ -29,6 +29,7 @@
 
     <script>
       // Your web app's Firebase configuration
+      
       var firebaseConfig = {
         apiKey: "AIzaSyDUhYdvOjMBv3ceBIH8IbTpZw2ZrzNgbzA",
         authDomain: "instaclone-777db.firebaseapp.com",
@@ -39,9 +40,13 @@
         appId: "1:30714864374:web:b6dc7635c456cb991002d7",
         measurementId: "G-4T1GZK59RS"
       };
+
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       firebase.analytics();
+
+      var db = firebase.firestore();
+
     </script>
 
 </body>

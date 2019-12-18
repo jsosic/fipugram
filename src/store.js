@@ -1,6 +1,7 @@
 export default {
     authenticated: false,
     userEmail: 'fake@email.com',
+    tipKorisnika: "",
     cards: [ 
         {
           id: 1,
