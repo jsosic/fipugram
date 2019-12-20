@@ -1,3 +1,21 @@
+# WEEK 6
+
+1. Micanje slika čiji URL nije valjan pomoću funkcije:
+
+```javascript
+function isValidURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+```
+
+2. Preuzimanje plugina za uplad slike sa: https://www.npmjs.com/package/vue-upload-image
+
 # WEEK 4
 
 - Uzmemo kod za autentikaciju s Firebasea i stavimo u index.js
