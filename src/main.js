@@ -7,6 +7,8 @@ import 'vue-croppa/dist/vue-croppa.css';
 Vue.use(Croppa)
 Vue.config.productionTip = false
 
+Vue.use(Croppa)   
+
 new Vue({
   router,
   render: h => h(App)

@@ -1,6 +1,6 @@
 <template>
 
-      <div class="card text-center">
+      <div class="card text-center mb-5">
         <div class="card-header text-left">
           By <strong>{{ info.email }}</strong>
         </div>
@@ -52,6 +52,11 @@ export default {
   computed: {
     timeAgo () {
       return moment(this.info.posted_at).fromNow()
+    }
+  },
+  computed: {
+    timeAgo() {
+      return moment(this.info.time).fromNow()
     }
   }
 }
