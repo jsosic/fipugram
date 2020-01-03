@@ -4,6 +4,5 @@ export default {
     newUrl: '',
     cards: [],
     searchTerm: '',
-    postComment: '',
-    imageData: null
+    postComment: ''
 }
