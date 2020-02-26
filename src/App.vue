@@ -83,17 +83,18 @@ export default {
           this.$router.push({name: 'login'}).catch(err => console.log(err))
       }
     });
-    db.collection("posts").orderBy("posted_at", "desc").limit(10)
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          const data = change.doc.data()
-          if (change.type !== "added") return
-            const card = {id: change.doc.id, url: data.url, email: data.email, title: 'Some title', posted_at: data.posted_at, comments: data.comments}
-            this.cards.unshift(card)
+
+    this.cards = []
+    db.collection("posts")
+      .orderBy("posted_at", "desc")
+      .limit(10)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          let data = doc.data()
+          const card = {id: doc.id, url: data.url, email: data.email, title: 'Some title', posted_at: data.posted_at, comments: data.comments}
+          this.cards.unshift(card)
         });
-        this.cards.sort((a, b) => {
-          return b.posted_at - a.posted_at
-        })
     });
   }
 }
