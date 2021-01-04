@@ -27,11 +27,14 @@
                 </form>
                 <!-- Image and text -->
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
+                    <li v-if="!store.currentUser" class="nav-item">
                         <router-link to="/login" class="nav-link">Login</router-link>
                     </li>
-                    <li class="nav-item">
+                    <li v-if="!store.currentUser" class="nav-item">
                         <router-link to="/signup" class="nav-link">Sign up</router-link>
+                    </li>
+                    <li v-if="store.currentUser" class="nav-item">
+                        <a href="#" @click.prevent="logout()" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -46,6 +49,24 @@
 
 <script>
 import store from '@/store';
+import { firebase } from '@/firebase';
+import router from '@/router';
+
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in.
+        console.log('*** User', user.email);
+        store.currentUser = user.email;
+    } else {
+        // User is not signed in.
+        console.log('*** No user');
+        store.currentUser = null;
+
+        if (router.name !== 'login') {
+            router.push({ name: 'login' });
+        }
+    }
+});
 
 export default {
     name: 'app',
@@ -53,6 +74,16 @@ export default {
         return {
             store,
         };
+    },
+    methods: {
+        logout() {
+            firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                    this.$router.push({ name: 'login' });
+                });
+        },
     },
 };
 </script>
