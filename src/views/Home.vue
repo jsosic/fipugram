@@ -1,16 +1,9 @@
 <template>
     <div class="row">
         <div class="col-8">
-            <form @submit.prevent="postNewImage" class="form-inline mb-5">
+            <form @submit.prevent="postNewImage" class="mb-5">
                 <div class="form-group">
-                    <label for="imageUrl">Image URL</label>
-                    <input
-                        v-model="newImageUrl"
-                        type="text"
-                        class="form-control ml-2"
-                        placeholder="Enter the image URL"
-                        id="imageUrl"
-                    />
+                    <croppa :width="400" :height="400" placeholder="Učitaj sliku..." v-model="imageReference"></croppa>
                 </div>
                 <div class="form-group">
                     <label for="imageDescription">Description</label>
@@ -35,7 +28,7 @@
 // @ is an alias to /src
 import InstagramCard from '@/components/InstagramCard.vue';
 import store from '@/store';
-import { db } from '@/firebase';
+import { db, storage } from '@/firebase';
 
 //... API/Firebase -> sve kartice -> cards
 
@@ -53,6 +46,7 @@ export default {
             store,
             newImageDescription: '',
             newImageUrl: '',
+            imageReference: null,
         };
     },
     mounted() {
@@ -84,26 +78,50 @@ export default {
                 });
         },
         postNewImage() {
-            const imageUrl = this.newImageUrl;
-            const imageDescription = this.newImageDescription;
+            this.imageReference.generateBlob((blobData) => {
+                console.log(blobData);
+                let imageName = 'posts/' + store.currentUser + '/' + Date.now() + '.png';
 
-            db.collection('posts')
-                .add({
-                    url: imageUrl,
-                    desc: imageDescription,
-                    email: store.currentUser,
-                    posted_at: Date.now(),
-                })
-                .then((doc) => {
-                    console.log('Spremljeno', doc);
-                    this.newImageDescription = '';
-                    this.newImageUrl = '';
+                storage
+                    .ref(imageName)
+                    .put(blobData)
+                    .then((result) => {
+                        // čuva this
+                        // ... uspješno spremanje
+                        result.ref
+                            .getDownloadURL()
+                            .then((url) => {
+                                // čuva
+                                console.log('Javni link', url);
 
-                    this.getPosts();
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
+                                const imageDescription = this.newImageDescription;
+
+                                db.collection('posts')
+                                    .add({
+                                        url: url,
+                                        desc: imageDescription,
+                                        email: store.currentUser,
+                                        posted_at: Date.now(),
+                                    })
+                                    .then((doc) => {
+                                        console.log('Spremljeno', doc);
+                                        this.newImageDescription = '';
+                                        this.imageReference.remove();
+
+                                        this.getPosts();
+                                    })
+                                    .catch((e) => {
+                                        console.error(e);
+                                    });
+                            })
+                            .catch((e) => {
+                                console.error(e);
+                            });
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                    });
+            });
         },
     },
     computed: {
