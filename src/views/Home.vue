@@ -1,7 +1,8 @@
 <template>
     <div class="row">
         <div class="col-8">
-            <form @submit.prevent="postNewImage" class="mb-5">
+            <img v-if="loading" class="loading" :src="require('@/assets/loading.gif')" />
+            <form v-if="!loading" @submit.prevent="postNewImage" class="mb-5">
                 <div class="form-group">
                     <croppa :width="400" :height="400" placeholder="Učitaj sliku..." v-model="imageReference"></croppa>
                 </div>
@@ -42,6 +43,7 @@ export default {
     name: 'home',
     data: function() {
         return {
+            loading: false,
             cards: [],
             store,
             newImageDescription: '',
@@ -85,42 +87,32 @@ export default {
                 });
             });
         },
-        postNewImage() {
-            this.getImage()
-                .then((blobData) => {
-                    console.log(blobData);
-                    let imageName = 'posts/' + store.currentUser + '/' + Date.now() + '.png';
+        async postNewImage() {
+            try {
+                this.loading = true;
+                let blobData = await this.getImage();
+                let imageName = 'posts/' + store.currentUser + '/' + Date.now() + '.png';
+                let result = await storage.ref(imageName).put(blobData);
+                let url = await result.ref.getDownloadURL(); // Promise
 
-                    return storage.ref(imageName).put(blobData);
-                })
-                .then((result) => {
-                    // čuva this
-                    // ... uspješno spremanje
-                    return result.ref.getDownloadURL(); // Promise
-                })
-                .then((url) => {
-                    // čuva
-                    console.log('Javni link', url);
+                // čuva
+                console.log('Javni link', url);
 
-                    const imageDescription = this.newImageDescription;
+                const imageDescription = this.newImageDescription;
 
-                    return db.collection('posts').add({
-                        url: url,
-                        desc: imageDescription,
-                        email: store.currentUser,
-                        posted_at: Date.now(),
-                    });
-                })
-                .then((doc) => {
-                    console.log('Spremljeno', doc);
-                    this.newImageDescription = '';
-                    this.imageReference.remove();
-
-                    this.getPosts();
-                })
-                .catch((e) => {
-                    console.error(e);
+                let doc = await db.collection('posts').add({
+                    url: url,
+                    desc: imageDescription,
+                    email: store.currentUser,
+                    posted_at: Date.now(),
                 });
+                console.log('Spremljeno', doc);
+
+                this.getPosts();
+            } catch (e) {
+                console.error('Greška', e);
+            }
+            this.loading = false;
         },
     },
     computed: {
@@ -136,3 +128,9 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.loading {
+    width: 400px;
+}
+</style>
