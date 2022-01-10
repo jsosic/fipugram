@@ -1,3 +1,4 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/5f329901-e2c7-4229-9f6d-ae585d9b5d5a/deploy-status)](https://app.netlify.com/sites/suspicious-boyd-93a22c/deploys)
 # vue create instaclone
 - Manually
 -- Babel
